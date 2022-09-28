@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    compile files('libs/gprintersdkv2.jar')
     implementation files('libs/gprintersdkv2.jar')
+    implementation files('libs/PosPrinterSDK.jar')
     implementation "androidx.core:core:1.6.0"
 //    implementation files("D:\\devtools\\flutter\\bin\\cache\\artifacts\\engine\\android-x64\\flutter.jar")
 }

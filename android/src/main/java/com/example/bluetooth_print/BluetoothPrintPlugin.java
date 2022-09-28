@@ -10,16 +10,33 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.ServiceConnection;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
+import android.os.IBinder;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.gprinter.command.FactoryCommand;
+import net.posprinter.posprinterface.IMyBinder;
+import net.posprinter.posprinterface.TaskCallback;
+import net.posprinter.service.PosprinterService;
+import net.posprinter.utils.PosPrinterDev;
+import net.posprinter.posprinterface.ProcessData;
+import net.posprinter.posprinterface.TaskCallback;
+import net.posprinter.utils.BitmapProcess;
+import net.posprinter.utils.BitmapToByteData;
+import net.posprinter.utils.DataForSendToPrinterTSC;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -44,7 +61,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   private int id = 0;
   private ThreadPool threadPool;
 
-  private static final String NAMESPACE = "bluetooth_print";
+  private static final String NAMESPACE = "bluetooth_x_print";
   private MethodChannel channel;
   private EventChannel stateChannel;
   private BluetoothManager mBluetoothManager;
@@ -58,6 +75,22 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
   private MethodCall pendingCall;
   private Result pendingResult;
   private static final int REQUEST_FINE_LOCATION_PERMISSIONS = 1452;
+
+  private static IMyBinder myBinder;
+  private static boolean IS_CONNECT = false;
+
+  ServiceConnection mSerconnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            myBinder = (IMyBinder) service;
+            Log.e(TAG, "connect");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.e(TAG, "disconnect");
+        }
+    };
 
   public static void registerWith(Registrar registrar) {
     final BluetoothPrintPlugin instance = new BluetoothPrintPlugin();
@@ -121,12 +154,19 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
       this.activity = activity;
       this.application = application;
       this.context = application;
+
+      Intent intent = new Intent(activity, PosprinterService.class);
+      activity.bindService(intent, mSerconnection, activity.BIND_AUTO_CREATE);
+
       channel = new MethodChannel(messenger, NAMESPACE + "/methods");
       channel.setMethodCallHandler(this);
+
       stateChannel = new EventChannel(messenger, NAMESPACE + "/state");
       stateChannel.setStreamHandler(stateHandler);
+
       mBluetoothManager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
       mBluetoothAdapter = mBluetoothManager.getAdapter();
+
       if (registrar != null) {
         // V1 embedding setup for activity listeners.
         registrar.addRequestPermissionsResultListener(this);
@@ -171,7 +211,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
         result.success(mBluetoothAdapter.isEnabled());
         break;
       case "isConnected":
-        result.success(threadPool != null);
+        result.success(IS_CONNECT);
         break;
       case "startScan":
       {
@@ -232,9 +272,6 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
     result.success(devices);
   }
 
-  /**
-   * 获取状态
-   */
   private void state(Result result){
     try {
       switch(mBluetoothAdapter.getState()) {
@@ -259,7 +296,6 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
     }
 
   }
-
 
   private void startScan(MethodCall call, Result result) {
     Log.d(TAG,"start scan ");
@@ -316,27 +352,21 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
     }
   }
 
-  /**
-   * 连接
-   */
-  private void connect(Result result, Map<String, Object> args){
+  private void connect(final Result result, Map<String, Object> args){
     if (args.containsKey("address")) {
       String address = (String) args.get("address");
       disconnect();
 
-      new DeviceConnFactoryManager.Build()
-              .setId(id)
-              //设置连接方式
-              .setConnMethod(DeviceConnFactoryManager.CONN_METHOD.BLUETOOTH)
-              //设置连接的蓝牙mac地址
-              .setMacAddress(address)
-              .build();
-      //打开端口
-      threadPool = ThreadPool.getInstantiation();
-      threadPool.addSerialTask(new Runnable() {
+      myBinder.ConnectBtPort(address, new TaskCallback() {
         @Override
-        public void run() {
-          DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
+        public void OnSucceed() {
+          IS_CONNECT = true;
+        }
+
+        @Override
+        public void OnFailed() {
+          IS_CONNECT = false;
+          result.error("OnFailed", "Cannot connect Device", null);
         }
       });
 
@@ -347,78 +377,85 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
 
   }
 
-  /**
-   * 重新连接回收上次连接的对象，避免内存泄漏
-   */
   private boolean disconnect(){
+    if (IS_CONNECT){
+      myBinder.DisconnectCurrentPort(new TaskCallback() {
+        @Override
+        public void OnSucceed() {
+          IS_CONNECT = false;
+        }
 
-    if(DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id]!=null&&DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].mPort!=null) {
-      DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].closePort();
+        @Override
+        public void OnFailed() {
+          IS_CONNECT = true;
+        }
+      });
     }
+
     return true;
   }
 
   private boolean destroy() {
-    DeviceConnFactoryManager.closeAllPort();
-    if (threadPool != null) {
-      threadPool.stopThreadPool();
-    }
-
     return true;
   }
 
-  private void printTest(Result result) {
-    if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null ||
-            !DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getConnState()) {
-
-      result.error("not connect", "state not right", null);
-    }
-
-    threadPool = ThreadPool.getInstantiation();
-    threadPool.addSerialTask(new Runnable() {
-      @Override
-      public void run() {
-        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentPrinterCommand() == PrinterCommand.ESC) {
-          DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendByteDataImmediately(FactoryCommand.printSelfTest(FactoryCommand.printerMode.ESC));
-        }else if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentPrinterCommand() == PrinterCommand.TSC) {
-          DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendByteDataImmediately(FactoryCommand.printSelfTest(FactoryCommand.printerMode.TSC));
-        }else if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentPrinterCommand() == PrinterCommand.CPCL) {
-          DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendByteDataImmediately(FactoryCommand.printSelfTest(FactoryCommand.printerMode.CPCL));
+  private void printTest(final Result result) {
+    if (IS_CONNECT) {
+      myBinder.WriteSendData(new TaskCallback() {
+        @Override
+        public void OnSucceed() {
         }
-      }
-    });
+
+        @Override
+        public void OnFailed() {
+            result.error("OnFailed", "Failed sending data to printer", null);
+        }
+      }, new ProcessData() {
+          @Override
+          public List<byte[]> processDataBeforeSend() {
+            List<byte[]> list = new ArrayList<>();
+            list.add(DataForSendToPrinterTSC.sizeBymm(50, 30));
+            list.add(DataForSendToPrinterTSC.gapBymm(2, 0));
+            list.add(DataForSendToPrinterTSC.cls());
+            list.add(DataForSendToPrinterTSC.direction(0));
+            list.add(DataForSendToPrinterTSC.qrCode(5, 5, "M", 10, "A", 0, "M1", "S3", "123456789"));
+            list.add(DataForSendToPrinterTSC.text(35, 30, "TSS24.BF2", 0, 1, 1, "Lorem ipsum dolot sit amet"));
+            list.add(DataForSendToPrinterTSC.print(1));
+
+            return list;
+          }
+      });
+    }
 
   }
 
   @SuppressWarnings("unchecked")
-  private void print(Result result, Map<String, Object> args) {
-    if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null ||
-            !DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getConnState()) {
-
+  private void print(final Result result, Map<String, Object> args) {
+    if (!IS_CONNECT) {
       result.error("not connect", "state not right", null);
     }
 
     if (args.containsKey("config") && args.containsKey("data")) {
-      final Map<String,Object> config = (Map<String,Object>)args.get("config");
-      final List<Map<String,Object>> list = (List<Map<String,Object>>)args.get("data");
-      if(list == null){
-        return;
-      }
+      final Map<String,Object> config = (Map<String,Object>) args.get("config");
+      final List<Map<String,Object>> list = (List<Map<String,Object>>) args.get("data");
+      if(list == null) return;
 
-      threadPool = ThreadPool.getInstantiation();
-      threadPool.addSerialTask(new Runnable() {
+      myBinder.WriteSendData(new TaskCallback() {
         @Override
-        public void run() {
-          if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentPrinterCommand() == PrinterCommand.ESC) {
-            DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(PrintContent.mapToReceipt(config, list));
-          }else if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentPrinterCommand() == PrinterCommand.TSC) {
-            DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(PrintContent.mapToLabel(config, list));
-          }else if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].getCurrentPrinterCommand() == PrinterCommand.CPCL) {
-            DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(PrintContent.mapToCPCL(config, list));
-          }
+        public void OnSucceed() {
         }
+
+        @Override
+        public void OnFailed() {
+            result.error("OnFailed", "Failed sending data to printer", null);
+        }
+      }, new ProcessData() {
+          @Override
+          public List<byte[]> processDataBeforeSend() {
+            return PrintQRCode.mapToLabel(config, list);
+          }
       });
-    }else{
+    } else {
       result.error("please add config or data", "", null);
     }
 
@@ -426,7 +463,6 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
 
   @Override
   public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
     if (requestCode == REQUEST_FINE_LOCATION_PERMISSIONS) {
       if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         startScan(pendingCall, pendingResult);
@@ -439,8 +475,6 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
     return false;
 
   }
-
-
 
   private final StreamHandler stateHandler = new StreamHandler() {
     private EventSink sink;
