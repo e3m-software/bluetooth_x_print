@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'bluetooth_print_model.dart';
 
 class BluetoothPrint {
-  static const String NAMESPACE = 'bluetooth_print';
+  static const String NAMESPACE = 'bluetooth_x_print';
   static const int CONNECTED = 1;
   static const int DISCONNECTED = 0;
 
