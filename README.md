@@ -1,61 +1,62 @@
-[![pub package](https://img.shields.io/pub/v/bluetooth_print.svg)](https://pub.dartlang.org/packages/bluetooth_print)
-
+Forked from [bluetooth_print](https://github.com/thon-ju/bluetooth_print)
 
 ## Introduction
 
 BluetoothPrint is a bluetooth plugin for [Flutter](https://flutter.dev), a new mobile SDK to help developers build bluetooth thermal printer apps for both iOS and Android.(for example, Gprinter pt-280、pt-380、gp-1324、gp-2120 eg.)
 
 ### Underway(please suggest)
+
 [ ] print x,y positions  
 [ ] set paper size  
 [ ] more print examples
 
 ### verison
-3.0.0（flutter 2.x）      
-2.0.0（flutter 1.12）       
-1.2.0（flutter 1.9） 
+
+3.0.0（flutter 2.x）  
+2.0.0（flutter 1.12）  
+1.2.0（flutter 1.9）
 
 ## Features
 
-|                         |      Android       |         iOS          |             Description            |
-| :---------------        | :----------------: | :------------------: |  :-------------------------------- |
-| scan                    | :white_check_mark: |  :white_check_mark:  | Starts a scan for Bluetooth Low Energy devices. |
-| connect                 | :white_check_mark: |  :white_check_mark:  | Establishes a connection to the device. |
-| disconnect              | :white_check_mark: |  :white_check_mark:  | Cancels an active or pending connection to the device. |
-| state                   | :white_check_mark: |  :white_check_mark:  | Stream of state changes for the Bluetooth Device. |
-| print test message      | :white_check_mark: |  :white_check_mark:  | print device test message. |
-| print text              | :white_check_mark: |  :white_check_mark:  | print custom text, support layout. |
-| print image             | :white_check_mark: |  :white_check_mark:  | print image. |
-| print qrcode            | :white_check_mark: |  :white_check_mark:  | print qrcode,support change size. |
-| print barcode           | :white_check_mark: |  :white_check_mark:  | print barcode |
-
+|                    |      Android       | Description                                            |
+| :----------------- | :----------------: | :----------------------------------------------------- |
+| scan               | :white_check_mark: | Starts a scan for Bluetooth Low Energy devices.        |
+| connect            | :white_check_mark: | Establishes a connection to the device.                |
+| disconnect         | :white_check_mark: | Cancels an active or pending connection to the device. |
+| state              | :white_check_mark: | Stream of state changes for the Bluetooth Device.      |
+| print test message | :white_check_mark: | print device test message.                             |
+| print text         | :white_check_mark: | print custom text, support layout.                     |
+| print image        | :white_check_mark: | print image.                                           |
+| print qrcode       | :white_check_mark: | print qrcode,support change size.                      |
+| print barcode      | :white_check_mark: | print barcode                                          |
 
 ## Usage
 
-[Example](https://github.com/thon-ju/bluetooth_print/blob/master/example/lib/main.dart)
+[Example](https://github.com/shancheas/bluetooth_x_print/blob/master/example/lib/main.dart)
 
 To use this plugin :
 
-- add the dependency to your [pubspec.yaml](https://github.com/thon-ju/bluetooth_print/blob/master/example/pubspec.yaml) file.
+- add the dependency to your [pubspec.yaml](https://github.com/shancheas/bluetooth_x_print/blob/master/example/pubspec.yaml) file.
 
 ```yaml
-  dependencies:
-    flutter:
-      sdk: flutter
-    bluetooth_print:
+dependencies:
+  flutter:
+    sdk: flutter
+  bluetooth_print:
 ```
 
 - init a BluetoothPrint instance
 
 ```dart
-import 'package:bluetooth_print/bluetooth_print.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+import 'package:bluetooth_x_print/bluetooth_print.dart';
+import 'package:bluetooth_x_print/bluetooth_print_model.dart';
 
 
 BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
 ```
 
 ### scan
+
 ```dart
 // begin scan
 bluetoothPrint.startScan(timeout: Duration(seconds: 4));
@@ -83,16 +84,19 @@ StreamBuilder<List<BluetoothDevice>>(
 ```
 
 ### connect
+
 ```dart
 await bluetoothPrint.connect(_device);
 ```
 
 ### disconnect
+
 ```dart
 await bluetoothPrint.disconnect();
 ```
 
 ### listen state
+
 ```dart
       bluetoothPrint.state.listen((state) {
       print('cur device status: $state');
@@ -114,9 +118,11 @@ await bluetoothPrint.disconnect();
       }
     });
 ```
+
 A new flutter plugin project.
 
 ### print (esc command, receipt mode)
+
 ```dart
     Map<String, dynamic> config = Map();
     List<LineText> list = List();
@@ -134,18 +140,16 @@ A new flutter plugin project.
     List<int> imageBytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     String base64Image = base64Encode(imageBytes);
     list.add(LineText(type: LineText.TYPE_IMAGE, content: base64Image, align: LineText.ALIGN_CENTER, linefeed: 1));
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
 
     await bluetoothPrint.printReceipt(config, list);
 ```
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
+
+For help getting started with Flutter, view our
+[online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
 ### print (tsc command, label mode)
+
 ```dart
     Map<String, dynamic> config = Map();
     config['width'] = 40; // 标签宽度，单位mm
@@ -169,33 +173,6 @@ samples, guidance on mobile development, and a full API reference.
     await bluetoothPrint.printLabel(config, list1);
 ```
 
-
-## Troubleshooting
-#### ios import third party library
-[Please Read link: https://stackoverflow.com/questions/19189463/cocoapods-podspec-issue)         
-*.podspec add:
-```
-# .a filename must begin with lib, eg. 'libXXX.a'
-s.vendored_libraries = '**/*.a'
-```
-
-#### error:'State restoration of CBCentralManager is only allowed for applications that have specified the "bluetooth-central" background mode'    
-info.plist add:
-```
-<key>NSBluetoothAlwaysUsageDescription</key>
-<string>Allow App use bluetooth?</string>
-<key>NSBluetoothPeripheralUsageDescription</key>
-<string>Allow App use bluetooth?</string>
-<key>UIBackgroundModes</key>
-<array>
-    <string>bluetooth-central</string>
-    <string>bluetooth-peripheral</string>
-</array>
-```
-
-## FAQ Support
-you can join this [QQ](https://im.qq.com/index.shtml) group, feedback your problem  
-<img src="assets/bluetooth_print.png">
-
 ## Thanks For
+
 - [flutter_blue](https://github.com/pauldemarco/flutter_blue)
