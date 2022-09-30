@@ -1,4 +1,4 @@
-package com.example.bluetooth_print;
+package com.example.bluetooth_x_print;
 
 import android.Manifest;
 import android.app.Activity;

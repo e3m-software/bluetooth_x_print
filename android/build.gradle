@@ -1,4 +1,4 @@
-group 'com.example.bluetooth_print'
+group 'com.example.bluetooth_x_print'
 version '1.0'
 
 buildscript {

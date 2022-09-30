@@ -1,15 +1,15 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint bluetooth_print.podspec' to validate before publishing.
+# Run `pod lib lint bluetooth_x_print.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'bluetooth_print'
+  s.name             = 'bluetooth_x_print'
   s.version          = '0.0.1'
   s.summary          = 'A new flutter plugin for bluetooth printer.'
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
-  s.homepage         = 'https://github.com/thon-ju/bluetooth_print'
+  s.homepage         = 'https://github.com/thon-ju/bluetooth_x_print'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'thon.ju@gmail.com' }
   s.source           = { :path => '.' }
