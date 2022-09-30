@@ -1,7 +1,7 @@
 name: bluetooth_x_print
 description: X Printer Support for Flutter
-version: 1.0.4
-homepage: https://github.com/thon-ju/bluetooth_print
+version: 1.0.5
+homepage: https://github.com/e3m-software/bluetooth_x_print
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
