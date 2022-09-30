@@ -1,5 +1,5 @@
 name: bluetooth_x_print
-description: A new flutter plugin project connect to bluetooth thermal printer (X printer).
+description: X Printer Support for Flutter
 version: 1.0.2
 homepage: https://github.com/thon-ju/bluetooth_print
 
