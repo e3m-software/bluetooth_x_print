@@ -1,4 +1,4 @@
-package com.example.bluetooth_print;
+package com.example.bluetooth_x_print;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,7 +11,6 @@ import android.util.Log;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.ArrayList;
 
 public class PrintQRCode {

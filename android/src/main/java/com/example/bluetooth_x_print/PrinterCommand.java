@@ -1,4 +1,4 @@
-package com.example.bluetooth_print;
+package com.example.bluetooth_x_print;
 
 public enum PrinterCommand {
     /**

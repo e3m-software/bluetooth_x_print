@@ -1,4 +1,4 @@
-package com.example.bluetooth_print;
+package com.example.bluetooth_x_print;
 
 import android.Manifest;
 import android.app.Activity;
@@ -17,24 +17,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.ServiceConnection;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbManager;
 import android.os.IBinder;
 import android.util.Log;
-import androidx.annotation.NonNull;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.gprinter.command.FactoryCommand;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.TaskCallback;
 import net.posprinter.service.PosprinterService;
-import net.posprinter.utils.PosPrinterDev;
 import net.posprinter.posprinterface.ProcessData;
-import net.posprinter.posprinterface.TaskCallback;
-import net.posprinter.utils.BitmapProcess;
-import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterTSC;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
