@@ -37,10 +37,12 @@ public class PrintQRCode {
                   int x = (int)(m.get("x") == null ? 0 : m.get("x")); //dpi: 1mm约为8个点
                   int y = (int)(m.get("y") == null ? 0 : m.get("y"));
                   int size = (int)(m.get("size") == null ? 10 : m.get("size"));
+                  int x_multification = (int)(m.get("x_multification") == null ? 1 : m.get("x_multification"))
+                  int y_multification = (int)(m.get("y_multification") == null ? 1 : m.get("y_multification"))
                   Log.d(TAG, type);
 
                   if ("text".equals(type)) {
-                        list.add(DataForSendToPrinterTSC.text(x, y, "TSS24.BF2", 0, 1, 1, content));
+                        list.add(DataForSendToPrinterTSC.text(x, y, "TSS24.BF2", 0, x_multification, y_multification, content));
                   } else if("barcode".equals(type)) {
                         list.add(DataForSendToPrinterTSC.barCode(x, y, "128", 100, 1, 0, 2, 2, content));
                   } else if("qrcode".equals(type)) {
