@@ -43,6 +43,9 @@ LineText _$LineTextFromJson(Map<String, dynamic> json) {
     linefeed: json['linefeed'] as int?,
     x: json['x'] as int?,
     y: json['y'] as int?,
+    x_multification: json['x_multification'] as int?,
+    y_multification: json['y_multification'] as int?,
+    font_type: json['font_type'] as String?,
   );
 }
 
@@ -66,5 +69,8 @@ Map<String, dynamic> _$LineTextToJson(LineText instance) {
   writeNotNull('linefeed', instance.linefeed);
   writeNotNull('x', instance.x);
   writeNotNull('y', instance.y);
+  writeNotNull('x_multification', instance.x_multification);
+  writeNotNull('y_multification', instance.y_multification);
+  writeNotNull('font_type', instance.font_type);
   return val;
 }

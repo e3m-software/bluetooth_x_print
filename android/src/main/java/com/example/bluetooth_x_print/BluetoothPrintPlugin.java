@@ -406,12 +406,12 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
           @Override
           public List<byte[]> processDataBeforeSend() {
             List<byte[]> list = new ArrayList<>();
-            list.add(DataForSendToPrinterTSC.sizeBymm(50, 30));
+            list.add(DataForSendToPrinterTSC.sizeBymm(70, 50));
             list.add(DataForSendToPrinterTSC.gapBymm(2, 0));
             list.add(DataForSendToPrinterTSC.cls());
             list.add(DataForSendToPrinterTSC.direction(0));
-            list.add(DataForSendToPrinterTSC.qrCode(5, 5, "M", 10, "A", 0, "M1", "S3", "123456789"));
-            list.add(DataForSendToPrinterTSC.text(35, 30, "TSS24.BF2", 0, 1, 1, "Lorem ipsum dolot sit amet"));
+            list.add(DataForSendToPrinterTSC.qrCode(10, 30, "M", 6, "A", 0, "M1", "S3", "123456789"));
+            list.add(DataForSendToPrinterTSC.text(150, 30, "5", 0, 1, 1, "XXXXXX XXXXXXX"));
             list.add(DataForSendToPrinterTSC.print(1));
 
             return list;

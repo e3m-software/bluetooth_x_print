@@ -20,16 +20,19 @@ class BluetoothDevice {
 class LineText {
   LineText(
       {this.type, //text,barcode,qrcode,image(base64 string)
-      this.content,
-      this.size = 0,
-      this.align = ALIGN_LEFT,
-      this.weight = 0, //0,1
-      this.width = 0, //0,1
-      this.height = 0, //0,1
-      this.underline = 0, //0,1
-      this.linefeed = 0, //0,1
-      this.x = 0,
-      this.y = 0});
+        this.content,
+        this.size = 0,
+        this.align = ALIGN_LEFT,
+        this.weight = 0, //0,1
+        this.width = 0, //0,1
+        this.height = 0, //0,1
+        this.underline = 0, //0,1
+        this.linefeed = 0, //0,1
+        this.x = 0,
+        this.y = 0,
+        this.font_type = "0",
+        this.x_multification = 1,
+        this.y_multification = 1});
 
   static const String TYPE_TEXT = 'text';
   static const String TYPE_BARCODE = 'barcode';
@@ -50,6 +53,9 @@ class LineText {
   final int? linefeed;
   final int? x;
   final int? y;
+  final String? font_type;
+  final int? x_multification;
+  final int? y_multification;
 
   factory LineText.fromJson(Map<String, dynamic> json) =>
       _$LineTextFromJson(json);

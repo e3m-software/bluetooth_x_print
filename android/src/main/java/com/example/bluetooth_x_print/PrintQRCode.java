@@ -23,7 +23,6 @@ public class PrintQRCode {
             int height = (int)(config.get("height") == null ? 30 : config.get("height")); // 单位：mm
             int gap = (int)(config.get("gap") == null ? 2 : config.get("gap")); // 单位：mm
             int qty = (int)(config.get("qty") == null ? 1 : config.get("qty")); // 单位：mm
-
             
             list.add(DataForSendToPrinterTSC.sizeBymm(width, height));
             list.add(DataForSendToPrinterTSC.gapBymm(gap, 0));
@@ -36,13 +35,15 @@ public class PrintQRCode {
                   String content = (String) m.get("content");
                   int x = (int)(m.get("x") == null ? 0 : m.get("x")); //dpi: 1mm约为8个点
                   int y = (int)(m.get("y") == null ? 0 : m.get("y"));
+                  String font_type = (String) (m.get("font_type") == null ? "TSS24.BF2" : m.get("font_type"));
                   int size = (int)(m.get("size") == null ? 10 : m.get("size"));
-                  int x_multification = (int)(m.get("x_multification") == null ? 1 : m.get("x_multification"))
-                  int y_multification = (int)(m.get("y_multification") == null ? 1 : m.get("y_multification"))
+                  int x_multification = (int)(m.get("x_multification") == null ? 1 : m.get("x_multification"));
+                  int y_multification = (int)(m.get("y_multification") == null ? 1 : m.get("y_multification"));
                   Log.d(TAG, type);
 
                   if ("text".equals(type)) {
-                        list.add(DataForSendToPrinterTSC.text(x, y, "TSS24.BF2", 0, x_multification, y_multification, content));
+                        list.add(DataForSendToPrinterTSC.text(x, y, font_type, 0, x_multification, y_multification, content));
+                        Log.d(TAG, x + ", " + y + ", " + font_type + ", " + x_multification + ", " + y_multification);
                   } else if("barcode".equals(type)) {
                         list.add(DataForSendToPrinterTSC.barCode(x, y, "128", 100, 1, 0, 2, 2, content));
                   } else if("qrcode".equals(type)) {
