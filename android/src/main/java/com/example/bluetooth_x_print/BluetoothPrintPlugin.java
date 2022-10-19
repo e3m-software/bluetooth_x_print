@@ -447,7 +447,7 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
                     list.add(DataForSendToPrinterTSC.gapBymm(20, 0));
                     list.add(DataForSendToPrinterTSC.cls());
                     list.add(DataForSendToPrinterTSC.direction(0));
-                    list.add(DataForSendToPrinterTSC.qrCode(20, 40, "L", 10, "A", 0, "M1", "S3", "ASD"));
+                    list.add(DataForSendToPrinterTSC.qrCode(20, 40, "L", 8, "A", 0, "M1", "S3", "ASD"));
                     list.add(DataForSendToPrinterTSC.text(250, 42, "TSS24.BF2", 0, 1, 1, "Hello World"));
                     list.add(DataForSendToPrinterTSC.text(250, 112, "TSS24.BF2", 0, 1, 1, "Haha"));
                     list.add(DataForSendToPrinterTSC.text(250, 142, "TSS24.BF2", 0, 1, 1, "sdasdsad"));
