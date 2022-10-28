@@ -31,6 +31,7 @@ class LineText {
         this.x = 0,
         this.y = 0,
         this.font_type = "0",
+        this.rotation = 0,
         this.x_multification = 1,
         this.y_multification = 1});
 
@@ -54,6 +55,7 @@ class LineText {
   final int? x;
   final int? y;
   final String? font_type;
+  final int? rotation;
   final int? x_multification;
   final int? y_multification;
 
