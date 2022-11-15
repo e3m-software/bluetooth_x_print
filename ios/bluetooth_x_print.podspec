@@ -3,13 +3,13 @@
 # Run `pod lib lint bluetooth_print.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'bluetooth_print'
+  s.name             = 'bluetooth_x_print'
   s.version          = '0.0.1'
   s.summary          = 'A new flutter plugin for bluetooth printer.'
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
-  s.homepage         = 'https://github.com/thon-ju/bluetooth_print'
+  s.homepage         = 'https://github.com/e3m-software/bluetooth_x_print'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'thon.ju@gmail.com' }
   s.source           = { :path => '.' }
@@ -17,7 +17,7 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.static_framework = true
   s.dependency 'Flutter'
-  s.platform = :ios, '8.0'
+  s.platform = :ios, '11.0'
 
   # 引入Classes文件夹下所有的*.a库
   s.frameworks = ["SystemConfiguration", "CoreTelephony","WebKit"]
