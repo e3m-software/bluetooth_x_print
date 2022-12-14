@@ -353,16 +353,16 @@ public class BluetoothPrintPlugin implements FlutterPlugin, ActivityAware, Metho
         @Override
         public void OnSucceed() {
           IS_CONNECT = true;
+          result.success(true);
         }
 
         @Override
         public void OnFailed() {
           IS_CONNECT = false;
+          result.success(false);
           result.error("OnFailed", "Cannot connect Device", null);
         }
       });
-
-      result.success(true);
     } else {
       result.error("invalid_argument", "argument 'address' not found", null);
     }
